@@ -341,9 +341,10 @@ func (s *ProxyService) completions(c *gin.Context) {
 	body, _ = sjson.DeleteBytes(body, "intent_threshold")
 	body, _ = sjson.DeleteBytes(body, "intent_content")
 
-	if int(gjson.GetBytes(body, "max_tokens").Int()) > s.cfg.ChatMaxTokens {
-		body, _ = sjson.SetBytes(body, "max_tokens", s.cfg.ChatMaxTokens)
-	}
+	//if int(gjson.GetBytes(body, "max_tokens").Int()) > s.cfg.ChatMaxTokens {
+	//	body, _ = sjson.SetBytes(body, "max_tokens", s.cfg.ChatMaxTokens)
+	//}
+	body, _ = sjson.SetBytes(body, "max_tokens", 4096)
 
 	proxyUrl := s.cfg.ChatApiBase + "/chat/completions"
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, proxyUrl, io.NopCloser(bytes.NewBuffer(body)))
@@ -407,6 +408,7 @@ func (s *ProxyService) codeCompletions(c *gin.Context) {
 	}
 
 	body = ConstructRequestBody(body, s.cfg)
+	body, _ = sjson.SetBytes(body, "n", 1)
 
 	proxyUrl := s.cfg.CodexApiBase + "/completions"
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, proxyUrl, io.NopCloser(bytes.NewBuffer(body)))
